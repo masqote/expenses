@@ -390,7 +390,7 @@ class TelegramWebhookController extends Controller
 
     private function linkingInstructions(): string
     {
-        $webUrl = config('app.url');
+        $webUrl = config('app.frontend_url');
         return "To get started, link your account:\n\n"
             . "1️⃣ Open: <a href=\"{$webUrl}\">{$webUrl}</a>\n"
             . "2️⃣ Click <b>Link Telegram</b> in the sidebar\n"

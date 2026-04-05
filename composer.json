@@ -8,7 +8,12 @@
         "php": "^8.2",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "symfony/clock": "^7.0",
+        "symfony/css-selector": "^7.0",
+        "symfony/event-dispatcher": "^7.0",
+        "symfony/string": "^7.0",
+        "symfony/translation": "^7.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -36,8 +41,7 @@
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
-            "@php -r \"$f='vendor/laravel/framework/config/database.php'; file_put_contents($f, str_replace('PDO::MYSQL_ATTR_SSL_CA', '\\\\Pdo\\\\Mysql::ATTR_SSL_CA', file_get_contents($f)));\""
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
@@ -60,6 +64,9 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "platform": {
+            "php": "8.2.0"
+        },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true

@@ -1,8 +1,10 @@
 [phases.build]
-cmds = ["composer install --no-dev --optimize-autoloader", "php artisan config:cache", "php artisan route:cache"]
-
-[phases.deploy]
-cmds = ["php artisan migrate --force"]
+cmds = [
+  "composer install --no-dev --optimize-autoloader --ignore-platform-reqs",
+  "sed -i 's/PDO::MYSQL_ATTR_SSL_CA/1014/g' vendor/laravel/framework/config/database.php",
+  "php artisan config:clear",
+  "php artisan route:clear"
+]
 
 [start]
-cmd = "php artisan serve --host=0.0.0.0 --port=$PORT"
+cmd = "php artisan migrate --force && php artisan db:seed --class=UserSeeder --force && php artisan config:cache && php artisan route:cache && php artisan serve --host=0.0.0.0 --port=$PORT"

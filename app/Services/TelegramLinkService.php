@@ -15,7 +15,7 @@ class TelegramLinkService
     {
         $token     = Str::random(32);
         $hashed    = hash('sha256', $token);
-        $expiresAt = now()->addMinutes(15);
+        $expiresAt = now()->addDay();
 
         $this->telegramLinkRepo->upsertForUser($userId, [
             'link_token'       => $hashed,

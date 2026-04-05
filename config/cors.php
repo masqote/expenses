@@ -7,7 +7,8 @@ return [
         'http://localhost:3000',
         'http://127.0.0.1:3000',
         'http://192.168.100.15:3000',
-        env('FRONTEND_URL', ''),  // set this in production .env
+        'https://frontend-omega-silk-44.vercel.app',
+        env('FRONTEND_URL', ''),
     ],
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],

@@ -20,8 +20,8 @@ use App\Http\Controllers\TelegramWebhookController;
 |--------------------------------------------------------------------------
 */
 
-// Public auth routes
-Route::post('/register', [AuthController::class, 'register']);
+// Public auth routes - register disabled
+// Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // Telegram webhook (no Sanctum auth — secured via secret token)
