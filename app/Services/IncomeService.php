@@ -19,6 +19,11 @@ class IncomeService
         return $this->incomeRepository->getForUserAndPeriod($userId, $period);
     }
 
+    public function getForDateRange(int $userId, string $from, string $to): Collection
+    {
+        return $this->incomeRepository->getForUserAndDateRange($userId, $from, $to);
+    }
+
     public function createFromQuickInput(int $userId, string $quickInput, string $period): Income
     {
         $parsed = $this->parser->parse($quickInput);

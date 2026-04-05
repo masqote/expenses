@@ -11,9 +11,11 @@ class SummaryController extends Controller
 
     public function show(Request $request)
     {
-        $period  = $request->query('period', date('Y-m'));
-        $summary = $this->calculator->calculate($request->user()->id, $period);
+        $today = date('Y-m-d');
+        $from  = $request->query('from', date('Y-m-01'));
+        $to    = $request->query('to', $today);
+        $summary = $this->calculator->calculateRange($request->user()->id, $from, $to);
 
-        return response()->json(array_merge(['period' => $period], $summary));
+        return response()->json(array_merge(['from' => $from, 'to' => $to], $summary));
     }
 }

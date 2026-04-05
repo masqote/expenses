@@ -11,8 +11,9 @@ class GroupExpenseController extends Controller
 
     public function index(Request $request, $group)
     {
-        $period   = $request->query('period', date('Y-m'));
-        $expenses = $this->groupExpenseService->getGroupExpenses((int) $group, $period);
+        $from     = $request->query('from', date('Y-m-01'));
+        $to       = $request->query('to', date('Y-m-d'));
+        $expenses = $this->groupExpenseService->getGroupExpensesRange((int) $group, $from, $to);
 
         return response()->json($expenses);
     }

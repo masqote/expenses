@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Repositories\Contracts\AdjustmentRepositoryInterface;
 use App\Repositories\Contracts\CategoryRepositoryInterface;
 use App\Repositories\Contracts\ExpenseRepositoryInterface;
 use App\Repositories\Contracts\GroupRepositoryInterface;
@@ -10,6 +11,7 @@ use App\Repositories\Contracts\InviteRepositoryInterface;
 use App\Repositories\Contracts\SalaryRepositoryInterface;
 use App\Repositories\Contracts\TelegramLinkRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\AdjustmentRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\ExpenseRepository;
 use App\Repositories\GroupRepository;
@@ -28,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+        $this->app->bind(AdjustmentRepositoryInterface::class, AdjustmentRepository::class);
         $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
         $this->app->bind(ExpenseRepositoryInterface::class, ExpenseRepository::class);
         $this->app->bind(IncomeRepositoryInterface::class, IncomeRepository::class);

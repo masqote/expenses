@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\AdjustmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\IncomeController;
@@ -46,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Salary
     Route::get('/salary', [SalaryController::class, 'show']);
     Route::post('/salary', [SalaryController::class, 'store']);
+    Route::delete('/salary/{period}', [SalaryController::class, 'destroy']);
 
     // Personal summary
     Route::get('/summary', [SummaryController::class, 'show']);
@@ -71,4 +73,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Telegram link token
     Route::post('/telegram/link-token', [TelegramLinkController::class, 'generate']);
+
+    // Adjustments
+    Route::get('/adjustments', [AdjustmentController::class, 'index']);
+    Route::post('/adjustments', [AdjustmentController::class, 'store']);
+    Route::delete('/adjustments/{id}', [AdjustmentController::class, 'destroy']);
 });

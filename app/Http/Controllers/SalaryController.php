@@ -12,15 +12,17 @@ class SalaryController extends Controller
 
     public function show(Request $request)
     {
-        $period = $request->query('period', date('Y-m'));
-        $salary = $this->salaryService->getForPeriod($request->user()->id, $period);
-
-        return response()->json($salary);
+        // Return all salary entries for the user
+        $salaries = $this->salaryService->allForUser($request->user()->id);
+        return response()->json($salaries);
     }
 
     public function store(StoreSalaryRequest $request)
     {
-        $period = $request->input('period', date('Y-m'));
+        $period = $request->input('period', date('Y-m-d'));
+        // Normalize YYYY-MM to YYYY-MM-01
+        if (strlen($period) === 7) $period .= '-01';
+
         $salary = $this->salaryService->upsert(
             $request->user()->id,
             $period,
@@ -28,5 +30,11 @@ class SalaryController extends Controller
         );
 
         return response()->json($salary, 201);
+    }
+
+    public function destroy(Request $request, string $period)
+    {
+        $this->salaryService->delete($request->user()->id, $period);
+        return response()->noContent();
     }
 }

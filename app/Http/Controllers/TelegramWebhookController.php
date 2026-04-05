@@ -144,8 +144,8 @@ class TelegramWebhookController extends Controller
                     break;
 
                 case 'salary':
-                    $session->setStep('salary:month', []);
-                    $this->botService->sendMessage($chatId, "💼 <b>Set Salary</b>\n\nChoose the month:", $this->botService->monthKeyboard());
+                    $session->setStep('salary:date', []);
+                    $this->botService->sendMessage($chatId, "💼 <b>Set Salary</b>\n\nWhen did you receive it?", $this->botService->dateKeyboard());
                     break;
 
                 case 'summary':
@@ -174,10 +174,10 @@ class TelegramWebhookController extends Controller
             $sessionData = $session->data ?? [];
 
             if ($dateChoice === 'today') {
-                $period = date('Y-m');
+                $period = date('Y-m-d');
                 $sessionData['period'] = $period;
             } elseif ($dateChoice === 'yesterday') {
-                $period = date('Y-m', strtotime('-1 day'));
+                $period = date('Y-m-d', strtotime('-1 day'));
                 $sessionData['period'] = $period;
             } elseif ($dateChoice === 'manual') {
                 // Ask for manual date
@@ -188,7 +188,7 @@ class TelegramWebhookController extends Controller
             }
 
             // Move to price step
-            $type = str_starts_with($step ?? '', 'expense') ? 'expense' : 'income';
+            $type = str_starts_with($step ?? '', 'expense') ? 'expense' : (str_starts_with($step ?? '', 'salary') ? 'salary' : 'income');
             $session->setStep("{$type}:amount", $sessionData);
             $this->botService->sendMessage($chatId, "💰 Enter the amount (Rp):", $this->botService->cancelKeyboard());
             return response()->json(['ok' => true]);
@@ -222,7 +222,7 @@ class TelegramWebhookController extends Controller
             case 'expense:date_manual':
                 $period = $this->parsePeriod($text);
                 if (! $period) {
-                    $this->botService->sendMessage($chatId, "❌ Invalid date. Use YYYY-MM format (e.g. 2026-04):", $this->botService->cancelKeyboard());
+                    $this->botService->sendMessage($chatId, "❌ Invalid date. Use YYYY-MM-DD format (e.g. 2026-04-10):", $this->botService->cancelKeyboard());
                     break;
                 }
                 $sessionData['period'] = $period;
@@ -237,7 +237,7 @@ class TelegramWebhookController extends Controller
                     $this->botService->sendMessage($chatId, "❌ Invalid amount. Enter a number (e.g. 15000):", $this->botService->cancelKeyboard());
                     break;
                 }
-                $period     = $sessionData['period'] ?? date('Y-m');
+                $period     = $sessionData['period'] ?? date('Y-m-d');
                 $label      = $sessionData['label'] ?? 'Expense';
                 $categoryId = $sessionData['category_id'] ?? null;
                 $catName    = $sessionData['category_name'] ?? 'Uncategorized';
@@ -269,7 +269,7 @@ class TelegramWebhookController extends Controller
             case 'income:date_manual':
                 $period = $this->parsePeriod($text);
                 if (! $period) {
-                    $this->botService->sendMessage($chatId, "❌ Invalid date. Use YYYY-MM format:", $this->botService->cancelKeyboard());
+                    $this->botService->sendMessage($chatId, "❌ Invalid date. Use YYYY-MM-DD format (e.g. 2026-04-10):", $this->botService->cancelKeyboard());
                     break;
                 }
                 $sessionData['period'] = $period;
@@ -284,7 +284,7 @@ class TelegramWebhookController extends Controller
                     $this->botService->sendMessage($chatId, "❌ Invalid amount. Enter a number:", $this->botService->cancelKeyboard());
                     break;
                 }
-                $period  = $sessionData['period'] ?? date('Y-m');
+                $period  = $sessionData['period'] ?? date('Y-m-d');
                 $label   = $sessionData['label'] ?? 'Income';
 
                 $income  = $this->incomeService->create($userId, $label, $amount, $period);
@@ -309,7 +309,7 @@ class TelegramWebhookController extends Controller
                     $this->botService->sendMessage($chatId, "❌ Invalid amount. Enter a number:", $this->botService->cancelKeyboard());
                     break;
                 }
-                $period = $sessionData['period'] ?? date('Y-m');
+                $period = $sessionData['period'] ?? date('Y-m-d');
                 $this->salaryService->upsert($userId, $period, $amount);
                 $session->clear();
 
@@ -332,11 +332,13 @@ class TelegramWebhookController extends Controller
 
     private function sendSummary(string $chatId, int $userId): void
     {
-        $period  = date('Y-m');
-        $summary = $this->calculator->calculate($userId, $period);
+        $today   = date('Y-m-d');
+        $from    = date('Y-m-25', strtotime('-1 month'));
+        if (date('d') >= 25) $from = date('Y-m-25');
+        $summary = $this->calculator->calculateRange($userId, $from, $today);
         $this->botService->sendMessage(
             $chatId,
-            "📊 <b>Summary — {$period}</b>\n\n"
+            "📊 <b>Summary</b> ({$from} → {$today})\n\n"
             . "💼 Salary: " . $this->fmt($summary['salary']) . "\n"
             . "💵 Income: " . $this->fmt($summary['total_income']) . "\n"
             . "💸 Expenses: " . $this->fmt($summary['total_expenses']) . "\n"
@@ -347,8 +349,10 @@ class TelegramWebhookController extends Controller
 
     private function sendBalance(string $chatId, int $userId): void
     {
-        $period  = date('Y-m');
-        $summary = $this->calculator->calculate($userId, $period);
+        $today   = date('Y-m-d');
+        $from    = date('Y-m-25', strtotime('-1 month'));
+        if (date('d') >= 25) $from = date('Y-m-25');
+        $summary = $this->calculator->calculateRange($userId, $from, $today);
         $this->botService->sendMessage(
             $chatId,
             "💰 Balance: " . $this->fmt($summary['balance']),
@@ -378,8 +382,9 @@ class TelegramWebhookController extends Controller
     private function parsePeriod(string $text): ?string
     {
         $text = trim($text);
-        if (preg_match('/^\d{4}-\d{2}$/', $text)) return $text;
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $text)) return substr($text, 0, 7);
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $text)) return $text;
+        // Accept YYYY-MM and default to 1st of month
+        if (preg_match('/^\d{4}-\d{2}$/', $text)) return $text . '-01';
         return null;
     }
 

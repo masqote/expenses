@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 interface IncomeRepositoryInterface
 {
     public function getForUserAndPeriod(int $userId, string $period): Collection;
+    public function getForUserAndDateRange(int $userId, string $from, string $to): Collection;
 
     public function create(array $data): Income;
 
@@ -18,4 +19,5 @@ interface IncomeRepositoryInterface
     public function delete(Income $income): void;
 
     public function sumForUserAndPeriod(int $userId, string $period): float;
+    public function sumForUserAndDateRange(int $userId, string $from, string $to): float;
 }

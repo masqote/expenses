@@ -15,8 +15,9 @@ class IncomeController extends Controller
 
     public function index(Request $request)
     {
-        $period  = $request->query('period', date('Y-m'));
-        $incomes = $this->incomeService->getForPeriod($request->user()->id, $period);
+        $from  = $request->query('from', date('Y-m-01'));
+        $to    = $request->query('to', date('Y-m-d'));
+        $incomes = $this->incomeService->getForDateRange($request->user()->id, $from, $to);
 
         return response()->json($incomes);
     }
@@ -24,7 +25,7 @@ class IncomeController extends Controller
     public function store(StoreIncomeRequest $request)
     {
         $user   = $request->user();
-        $period = $request->input('period', date('Y-m'));
+        $period = $request->input('period', date('Y-m-d'));
 
         if ($request->filled('quick_input')) {
             $income = $this->incomeService->createFromQuickInput(

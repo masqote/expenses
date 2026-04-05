@@ -11,9 +11,10 @@ class GroupSummaryController extends Controller
 
     public function show(Request $request, $group)
     {
-        $period  = $request->query('period', date('Y-m'));
-        $summary = $this->groupExpenseService->getGroupSummary((int) $group, $period);
+        $from    = $request->query('from', date('Y-m-01'));
+        $to      = $request->query('to', date('Y-m-d'));
+        $summary = $this->groupExpenseService->getGroupSummaryRange((int) $group, $from, $to);
 
-        return response()->json(array_merge(['period' => $period], $summary));
+        return response()->json(array_merge(['from' => $from, 'to' => $to], $summary));
     }
 }

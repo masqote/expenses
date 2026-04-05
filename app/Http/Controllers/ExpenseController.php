@@ -15,8 +15,9 @@ class ExpenseController extends Controller
 
     public function index(Request $request)
     {
-        $period   = $request->query('period', date('Y-m'));
-        $expenses = $this->expenseService->getForPeriod($request->user()->id, $period);
+        $from = $request->query('from', date('Y-m-01'));
+        $to   = $request->query('to', date('Y-m-d'));
+        $expenses = $this->expenseService->getForDateRange($request->user()->id, $from, $to);
 
         return response()->json($expenses);
     }
@@ -24,7 +25,7 @@ class ExpenseController extends Controller
     public function store(StoreExpenseRequest $request)
     {
         $user   = $request->user();
-        $period = $request->input('period', date('Y-m'));
+        $period = $request->input('period', date('Y-m-d'));
 
         if ($request->filled('quick_input')) {
             $parsed = $this->expenseService->createFromQuickInput(

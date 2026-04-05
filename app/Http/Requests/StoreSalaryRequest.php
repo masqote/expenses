@@ -15,7 +15,7 @@ class StoreSalaryRequest extends FormRequest
     {
         return [
             'amount' => ['required', 'numeric', 'min:0.01'],
-            'period' => ['nullable', 'regex:/^\d{4}-\d{2}$/'],
+            'period' => ['nullable', 'regex:/^\d{4}-\d{2}(-\d{2})?$/'],
         ];
     }
 }

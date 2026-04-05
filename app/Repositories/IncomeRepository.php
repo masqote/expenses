@@ -11,7 +11,17 @@ class IncomeRepository implements IncomeRepositoryInterface
     public function getForUserAndPeriod(int $userId, string $period): Collection
     {
         return Income::where('user_id', $userId)
-            ->where('period', $period)
+            ->where('period', 'like', $period . '%')
+            ->orderBy('period', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    public function getForUserAndDateRange(int $userId, string $from, string $to): Collection
+    {
+        return Income::where('user_id', $userId)
+            ->whereBetween('period', [$from, $to])
+            ->orderBy('period', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
     }
@@ -40,7 +50,14 @@ class IncomeRepository implements IncomeRepositoryInterface
     public function sumForUserAndPeriod(int $userId, string $period): float
     {
         return (float) Income::where('user_id', $userId)
-            ->where('period', $period)
+            ->where('period', 'like', $period . '%')
+            ->sum('amount');
+    }
+
+    public function sumForUserAndDateRange(int $userId, string $from, string $to): float
+    {
+        return (float) Income::where('user_id', $userId)
+            ->whereBetween('period', [$from, $to])
             ->sum('amount');
     }
 }

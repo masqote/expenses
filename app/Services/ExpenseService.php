@@ -19,6 +19,11 @@ class ExpenseService
         return $this->expenseRepository->getForUserAndPeriod($userId, $period);
     }
 
+    public function getForDateRange(int $userId, string $from, string $to): Collection
+    {
+        return $this->expenseRepository->getForUserAndDateRange($userId, $from, $to);
+    }
+
     public function createFromQuickInput(int $userId, string $quickInput, string $period, ?int $categoryId = null): Expense
     {
         $parsed = $this->parser->parse($quickInput);

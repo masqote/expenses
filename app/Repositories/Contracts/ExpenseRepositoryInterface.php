@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 interface ExpenseRepositoryInterface
 {
     public function getForUserAndPeriod(int $userId, string $period): Collection;
+    public function getForUserAndDateRange(int $userId, string $from, string $to): Collection;
 
     public function create(array $data): Expense;
 
@@ -18,6 +19,8 @@ interface ExpenseRepositoryInterface
     public function delete(Expense $expense): void;
 
     public function sumForUserAndPeriod(int $userId, string $period): float;
+    public function sumForUserAndDateRange(int $userId, string $from, string $to): float;
 
     public function getForGroupAndPeriod(array $userIds, string $period): Collection;
+    public function getForGroupAndDateRange(array $userIds, string $from, string $to): Collection;
 }
